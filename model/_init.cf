@@ -18,20 +18,20 @@
 """
 
 implementation apacheServer:
-    pkg = std::Package(name = "httpd", state = "installed")
-    svc = std::Service(name = "httpd", state = "running", onboot = true)
+    pkg = std::Package(host = host, name = "httpd", state = "installed")
+    svc = std::Service(host = host, name = "httpd", state = "running", onboot = true)
     svc.requires = [pkg, cfg_file, syscfg_file]
 
-    cfg_file = std::ConfigFile(path = "/etc/httpd/conf/httpd.conf",
+    cfg_file = std::ConfigFile(host = host, path = "/etc/httpd/conf/httpd.conf",
         content = template("apache/conf.tmpl"))
     cfg_file.requires = pkg
 
-    syscfg_file = std::ConfigFile(path = "/etc/sysconfig/httpd",
+    syscfg_file = std::ConfigFile(host = host, path = "/etc/sysconfig/httpd",
         content = template("apache/sysconfig.tmpl"))
     syscfg_file.requires = [pkg]
 
     for vhost in vhosts:
-        vhost_cfg = std::ConfigFile(path = "/etc/httpd/conf.d/{{ vhost.name.name }}.conf",
+        vhost_cfg = std::ConfigFile(host = host, path = "/etc/httpd/conf.d/{{ vhost.name.name }}.conf",
             content = template("apache/vhost.tmpl"))
         svc.requires = vhost_cfg
     end
