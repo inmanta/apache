@@ -1,0 +1,6 @@
+<VirtualHost *:80>
+    DocumentRoot    {{ vhost.document_root }}
+    ServerName      {{ vhost.name.name }}
+    ServerAlias     {% for alias in vhost.aliases %}{{ alias.name }} {% endfor %}
+</VirtualHost>
+
