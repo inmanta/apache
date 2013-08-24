@@ -21,7 +21,8 @@ implementation apacheServer:
     pkg = std::Package(host = host, name = "httpd", state = "installed")
     svc = std::Service(host = host, name = "httpd", state = "running", onboot = true)
     svc.requires = [pkg, cfg_file, syscfg_file]
-
+    svc.requires = self.requires
+    
     cfg_file = std::ConfigFile(host = host, path = "/etc/httpd/conf/httpd.conf",
         content = template("apache/conf.tmpl"))
     cfg_file.requires = pkg
@@ -29,13 +30,19 @@ implementation apacheServer:
     syscfg_file = std::ConfigFile(host = host, path = "/etc/sysconfig/httpd",
         content = template("apache/sysconfig.tmpl"))
     syscfg_file.requires = [pkg]
-
-    for vhost in vhosts:
-        vhost_cfg = std::ConfigFile(host = host, path = "/etc/httpd/conf.d/{{ vhost.name.name }}.conf",
-            content = template("apache/vhost.tmpl"))
-        svc.requires = vhost_cfg
-    end
 end
 
+implementation vhostImpl:
+    vhost_cfg = std::ConfigFile(host = webserver.host, path = "/etc/httpd/conf.d/{{ vhost.name.name }}.conf",
+        content = template("apache/vhost.tmpl"), 
+        requires = std::Package[host = webserver.host, name = "httpd"],
+        provides = std::Service[host = webserver.host, name = "httpd"])
+
+    dir = std::Directory(host = webserver.host, path = document_root, owner = "apache", group = "apache", mode = 755,
+        provides = vhost_cfg)
+end
 
 implement httpd::Server using apacheServer
+implement httpd::Vhost using vhostImpl
+
+
