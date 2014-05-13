@@ -24,17 +24,17 @@ implementation apacheServer for httpd::Server:
     svc.requires = self.requires
     
     #cfg_file = std::ConfigFile(host = host, path = "/etc/httpd/conf/httpd.conf",
-    #    content = template("apache/conf.tmpl"))
+    #    content = std::template("apache/conf.tmpl"))
     #cfg_file.requires = pkg
 
     syscfg_file = std::ConfigFile(host = host, path = "/etc/sysconfig/httpd",
-        content = template("apache/sysconfig.tmpl"))
+        content = std::template("apache/sysconfig.tmpl"))
     syscfg_file.requires = [pkg]
 end
 
 implementation vhostImpl for httpd::Vhost:
     vhost_cfg = std::ConfigFile(host = webserver.host, path = "/etc/httpd/conf.d/{{ vhost.name.name }}.conf",
-        content = template("apache/vhost.tmpl"), 
+        content = std::template("apache/vhost.tmpl"), 
         requires = std::Package[host = webserver.host, name = "httpd"],
         provides = std::Service[host = webserver.host, name = "httpd"])
 
