@@ -33,7 +33,7 @@ implementation apacheServer for httpd::Server:
 end
 
 implementation vhostImpl for httpd::Vhost:
-    vhost_cfg = std::ConfigFile(host = webserver.host, path = "/etc/httpd/conf.d/{{ vhost.name.name }}.conf",
+    vhost_cfg = std::ConfigFile(host = webserver.host, path = "/etc/httpd/conf.d/{{ name.name }}.conf",
         content = std::template("apache/vhost.tmpl"), 
         requires = std::Package[host = webserver.host, name = "httpd"],
         provides = std::Service[host = webserver.host, name = "httpd"])

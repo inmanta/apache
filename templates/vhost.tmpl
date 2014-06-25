@@ -1,12 +1,12 @@
 <VirtualHost *:80>
-    DocumentRoot    {{ vhost.document_root | std.cm("vhost docroot", "app ref") }}
-    ServerName      {{ vhost.name.name | std.cm("vhost hostname", "net ref") }}
-    {% if (vhost.alternate_names | length) > 0 %}
-    ServerAlias     {% for alias in vhost.aliases %}{{ alias.name | std.cm("vhost hostname", "net ref") }} {% endfor %}
+    DocumentRoot    {{ document_root }}
+    ServerName      {{ name.name }}
+    {% if (alternate_names | length) > 0 %}
+    ServerAlias     {% for alias in aliases %}{{ alias.name }} {% endfor %}
     {% endif %}
 
-    {% for alias in vhost.aliases %}
-    Alias {{ alias.web | std.cm("vhost alias", "app ref") }} {{ alias.dir | std.cm("vhost dir", "app ref") }}
+    {% for alias in aliases %}
+    Alias {{ alias.web }} {{ alias.dir }}
     {% endfor %}
 </VirtualHost>
 
