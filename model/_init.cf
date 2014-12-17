@@ -54,7 +54,9 @@ implementation vhostImplDEB for httpd::Vhost:
     vhost_cfg = std::ConfigFile(host = webserver.host, path = "/etc/apache2/sites-available/{{ name.name }}.conf",
         content = std::template("apache/vhost.tmpl"), 
         requires = std::Package[host = webserver.host, name = "apache2"],
-        provides = std::Service[host = webserver.host, name = "apache2"])
+        provides = std::Service[host = webserver.host, name = "apache2"], reload=true)
+    ln = std::Symlink(host=webserver.host, source="/etc/apache2/sites-available/{{ name.name }}.conf",
+        target="/etc/apache2/sites-enabled/{{ name.name }}.conf", requires=vhost_cfg)
 
     dir = std::Directory(host = webserver.host, path = document_root, owner = "www-data", group = "www-data", mode = 755,
         provides = vhost_cfg)
