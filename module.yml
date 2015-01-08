@@ -1,8 +1,7 @@
-name: apache
-version: 0.1.4
-source: git@github.com:bartv/imp-apache
+author: Bart Vanbrabant <bart@impera.io>
 license: Apache 2.0
-author: Bart Vanbrabant <bart.vanbrabant@cs.kuleuven.be>
-requires:
-    std: git@github.com:bartv/imp-std, ">= 0.1"
-    httpd: git@github.com:bartv/imp-httpd, ">= 0.1"
+name: apache
+requires: {httpd: 'git@github.com:bartv/imp-httpd, ">= 0.1"', std: 'git@github.com:bartv/imp-std,
+    ">= 0.1"'}
+source: git@github.com:bartv/imp-apache
+version: 0.1.5
