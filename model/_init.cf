@@ -16,56 +16,56 @@
     Contact: bart@impera.io
 """
 
-implementation apacheServerRPM for httpd::Server:
-    pkg = std::Package(host = host, name = "httpd", state = "installed")
-    svc = std::Service(host = host, name = "httpd", state = "running", onboot = true)
+entity Server extends web::ApplicationContainer:
+    """
+        An apache server
+    """
+end
+
+implementation apacheServerRPM for Server:
+    pkg = std::Package(host=host, name="httpd", state="installed")
+    svc = std::Service(host=host, name="httpd", state="running", onboot=true, reload=true)
     svc.requires = [pkg, syscfg_file]
     svc.requires = self.requires
     
-    #cfg_file = std::ConfigFile(host = host, path = "/etc/httpd/conf/httpd.conf",
-    #    content = std::template("apache/conf.tmpl"))
-    #cfg_file.requires = pkg
-
-    syscfg_file = std::ConfigFile(host = host, path = "/etc/sysconfig/httpd",
-        content = std::template("apache/sysconfig.tmpl"))
+    syscfg_file = std::ConfigFile(host=host, path="/etc/sysconfig/httpd",
+    content = std::template("apache/sysconfig.tmpl"))
     syscfg_file.requires = [pkg]
 end
 
-implementation apacheServerDEB for httpd::Server:
-    pkg = std::Package(host = host, name = "apache2-mpm-worker", state = "installed")
-    pkg2 = std::Package(host = host, name = "apache2", state = "installed")
-    svc = std::Service(host = host, name = "apache2", state = "running", onboot = true)
+implementation apacheServerDEB for Server:
+    pkg = std::Package(host=host, name="apache2-mpm-worker", state="installed")
+    pkg2 = std::Package(host=host, name="apache2", state="installed")
+    svc = std::Service(host=host, name="apache2", state="running", onboot=true, reload=true)
     svc.requires = [pkg, pkg2]
     svc.requires = self.requires
 end
 
-implementation vhostImplRPM for httpd::Vhost:
-    vhost_cfg = std::ConfigFile(host = webserver.host, path = "/etc/httpd/conf.d/{{ name.name }}.conf",
-        content = std::template("apache/vhost.tmpl"), 
-        requires = std::Package[host = webserver.host, name = "httpd"],
-        provides = std::Service[host = webserver.host, name = "httpd"])
+implementation appImplRPM for web::Application:
+    vhost_cfg = std::ConfigFile(host=container.host, path="/etc/httpd/conf.d/{{ name.hostname }}.conf",
+                                content=std::template("apache/vhost.tmpl"), 
+                                requires = std::Package[host=container.host, name="httpd"],
+                                provides = std::Service[host=container.host, name="httpd"])
 
-    dir = std::Directory(host = webserver.host, path = document_root, owner = "apache", group = "apache", mode = 755,
-        provides = vhost_cfg)
+    dir = std::Directory(host=container.host, path=document_root, owner="apache", group="apache",
+                         mode = 755, provides=vhost_cfg)
 end
 
-implementation vhostImplDEB for httpd::Vhost:
-    vhost_cfg = std::ConfigFile(host = webserver.host, path = "/etc/apache2/sites-available/{{ name.name }}.conf",
-        content = std::template("apache/vhost.tmpl"), 
-        requires = std::Package[host = webserver.host, name = "apache2"],
-        provides = std::Service[host = webserver.host, name = "apache2"], reload=true)
-    ln = std::Symlink(host=webserver.host, source="/etc/apache2/sites-available/{{ name.name }}.conf",
-        target="/etc/apache2/sites-enabled/{{ name.name }}.conf", requires=vhost_cfg,
-        provides=std::Service[host = webserver.host, name = "apache2"], reload=true)
+implementation appImplDEB for web::Application:
+    vhost_cfg = std::ConfigFile(host=container.host, content=std::template("apache/vhost.tmpl"), 
+                                path="/etc/apache2/sites-available/{{ name.name }}.conf",
+                                requires=std::Package[host=container.host, name="apache2"],
+                                provides=std::Service[host=container.host, name="apache2"],
+                                reload=true)
+    ln = std::Symlink(host=container.host, requires=vhost_cfg, reload=true,
+                      source="/etc/apache2/sites-available/{{ name.name }}.conf",
+                      target="/etc/apache2/sites-enabled/{{ name.name }}.conf",
+                      provides=std::Service[host=container.host, name="apache2"])
 
-    dir = std::Directory(host = webserver.host, path = document_root, owner = "www-data", group = "www-data", mode = 755,
-        provides = vhost_cfg)
+    dir = std::Directory(host=container.host, path=document_root, owner="www-data", 
+                         group="www-data", mode=755, provides=vhost_cfg)
 end
 
-implement httpd::Server using apacheServerRPM when std::familyof(host.os, "rhel") or std::familyof(host.os, "fedora")
-implement httpd::Server using apacheServerDEB when std::familyof(host.os, "ubuntu")
-implement httpd::Vhost using vhostImplRPM when std::familyof(webserver.host.os, "rhel") or std::familyof(webserver.host.os, "fedora")
-implement httpd::Vhost using vhostImplDEB when std::familyof(webserver.host.os, "ubuntu")
-
-
+implement Server using apacheServerRPM when std::familyof(host.os, "rhel") or std::familyof(host.os, "fedora")
+implement Server using apacheServerDEB when std::familyof(host.os, "ubuntu")
 

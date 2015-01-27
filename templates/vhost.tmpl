@@ -1,12 +1,8 @@
 <VirtualHost *:80>
     DocumentRoot    {{ document_root }}
-    ServerName      {{ name.name }}
-    {% if (alternate_names | length) > 0 %}
-    ServerAlias     {% for alias in aliases %}{{ alias.name }} {% endfor %}
+    ServerName      {{ name.hostname }}
+    {% if (aliases | length) > 0 %}
+    ServerAlias     {% for alias in aliases %}{{ alias.hostname }} {% endfor %}
     {% endif %}
-
-    {% for alias in aliases %}
-    Alias {{ alias.web }} {{ alias.dir }}
-    {% endfor %}
 </VirtualHost>
 
