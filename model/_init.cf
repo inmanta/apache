@@ -27,10 +27,17 @@ implementation apacheServerRPM for Server:
     svc = std::Service(host=host, name="httpd", state="running", onboot=true, reload=true)
     svc.requires = [pkg, syscfg_file]
     svc.requires = self.requires
-    
+
     syscfg_file = std::ConfigFile(host=host, path="/etc/sysconfig/httpd",
     content = std::template("apache/sysconfig.tmpl"))
     syscfg_file.requires = [pkg]
+
+    # put an empty index.html in the default documentroot so health checks do not fail
+    index_html = std::ConfigFile(host=host, path="/var/www/html/index.html", content="",
+                                 requires=pkg)
+
+    self.user = "apache"
+    self.group = "apache"
 end
 
 implementation apacheServerDEB for Server:
@@ -39,11 +46,18 @@ implementation apacheServerDEB for Server:
     svc = std::Service(host=host, name="apache2", state="running", onboot=true, reload=true)
     svc.requires = [pkg, pkg2]
     svc.requires = self.requires
+
+    # put an empty index.html in the default documentroot so health checks do not fail
+    index_html = std::ConfigFile(host=host, path="/var/www/html/index.html", content="",
+                                 requires=pkg)
+
+    self.user = "www-data"
+    self.group = "www-data"
 end
 
 implementation appImplRPM for web::Application:
     vhost_cfg = std::ConfigFile(host=container.host, path="/etc/httpd/conf.d/{{ name.hostname }}.conf",
-                                content=std::template("apache/vhost.tmpl"), 
+                                content=std::template("apache/vhost.tmpl"),
                                 requires = std::Package[host=container.host, name="httpd"],
                                 provides = std::Service[host=container.host, name="httpd"])
 
@@ -52,7 +66,7 @@ implementation appImplRPM for web::Application:
 end
 
 implementation appImplDEB for web::Application:
-    vhost_cfg = std::ConfigFile(host=container.host, content=std::template("apache/vhost.tmpl"), 
+    vhost_cfg = std::ConfigFile(host=container.host, content=std::template("apache/vhost.tmpl"),
                                 path="/etc/apache2/sites-available/{{ name.name }}.conf",
                                 requires=std::Package[host=container.host, name="apache2"],
                                 provides=std::Service[host=container.host, name="apache2"],
@@ -62,7 +76,7 @@ implementation appImplDEB for web::Application:
                       target="/etc/apache2/sites-enabled/{{ name.name }}.conf",
                       provides=std::Service[host=container.host, name="apache2"])
 
-    dir = std::Directory(host=container.host, path=document_root, owner="www-data", 
+    dir = std::Directory(host=container.host, path=document_root, owner="www-data",
                          group="www-data", mode=755, provides=vhost_cfg)
 end
 

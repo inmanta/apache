@@ -4,5 +4,10 @@
     {% if (aliases | length) > 0 %}
     ServerAlias     {% for alias in aliases %}{{ alias.hostname }} {% endfor %}
     {% endif %}
+
+    <Directory {{ document_root }}>
+        AllowOverride all
+        Require all granted
+    </Directory>
 </VirtualHost>
 
