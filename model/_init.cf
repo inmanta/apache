@@ -67,13 +67,13 @@ end
 
 implementation appImplDEB for web::Application:
     vhost_cfg = std::ConfigFile(host=container.host, content=std::template("apache/vhost.tmpl"),
-                                path="/etc/apache2/sites-available/{{ name.name }}.conf",
+                                path="/etc/apache2/sites-available/{{ name.hostname }}.conf",
                                 requires=std::Package[host=container.host, name="apache2"],
                                 provides=std::Service[host=container.host, name="apache2"],
                                 reload=true)
     ln = std::Symlink(host=container.host, requires=vhost_cfg, reload=true,
-                      source="/etc/apache2/sites-available/{{ name.name }}.conf",
-                      target="/etc/apache2/sites-enabled/{{ name.name }}.conf",
+                      source="/etc/apache2/sites-available/{{ name.hostname }}.conf",
+                      target="/etc/apache2/sites-enabled/{{ name.hostname }}.conf",
                       provides=std::Service[host=container.host, name="apache2"])
 
     dir = std::Directory(host=container.host, path=document_root, owner="www-data",
