@@ -60,9 +60,6 @@ implementation appImplRPM for web::Application:
                                 content=std::template("apache/vhost.tmpl"),
                                 requires = std::Package[host=container.host, name="httpd"],
                                 provides = std::Service[host=container.host, name="httpd"])
-
-    dir = std::Directory(host=container.host, path=document_root, owner="apache", group="apache",
-                         mode = 755, provides=vhost_cfg)
 end
 
 implementation appImplDEB for web::Application:
@@ -75,9 +72,6 @@ implementation appImplDEB for web::Application:
                       source="/etc/apache2/sites-available/{{ name.hostname }}.conf",
                       target="/etc/apache2/sites-enabled/{{ name.hostname }}.conf",
                       provides=std::Service[host=container.host, name="apache2"])
-
-    dir = std::Directory(host=container.host, path=document_root, owner="www-data",
-                         group="www-data", mode=755, provides=vhost_cfg)
 end
 
 implement Server using apacheServerRPM when std::familyof(host.os, "rhel") or std::familyof(host.os, "fedora")
