@@ -32,7 +32,7 @@ KeepAliveTimeout 15
 
 ##
 ## Server-Pool Size Regulation (MPM specific)
-## 
+##
 
 # prefork MPM
 # StartServers: number of server processes to start
@@ -61,7 +61,7 @@ MaxRequestsPerChild  4000
 StartServers         2
 MaxClients         150
 MinSpareThreads     25
-MaxSpareThreads     75 
+MaxSpareThreads     75
 ThreadsPerChild     25
 MaxRequestsPerChild  0
 </IfModule>
@@ -70,7 +70,7 @@ MaxRequestsPerChild  0
 # ports, in addition to the default. See also the <VirtualHost>
 # directive.
 #
-# Change this to Listen on specific IP addresses as shown below to 
+# Change this to Listen on specific IP addresses as shown below to
 # prevent Apache from glomming onto all bound IP addresses (0.0.0.0)
 Listen 80
 
@@ -139,7 +139,7 @@ LoadModule version_module modules/mod_version.so
 Include conf.d/*.conf
 
 # If you wish httpd to run as a different user or group, you must run
-# httpd as root initially and it will switch.  
+# httpd as root initially and it will switch.
 User apache
 Group apache
 
@@ -147,9 +147,9 @@ Group apache
 # ServerAdmin: Your address, where problems with the server should be
 # e-mailed.  This address appears on some server-generated pages, such
 # as error documents.  e.g. admin@your-domain.com
-ServerAdmin root@{{ host.name | std.cm("hostname", "host ref")}}
+ServerAdmin root@{{ host.name }}
 
-# UseCanonicalName: Determines how Apache constructs self-referencing 
+# UseCanonicalName: Determines how Apache constructs self-referencing
 # URLs and the SERVER_NAME and SERVER_PORT variables.
 # When set "Off", Apache will use the Hostname and Port supplied
 # by the client.  When set "On", Apache will use the value of the
@@ -165,10 +165,10 @@ DocumentRoot "/var/www/html"
 #
 # Each directory to which Apache has access can be configured with respect
 # to which services and features are allowed and/or disabled in that
-# directory (and its subdirectories). 
+# directory (and its subdirectories).
 #
-# First, we configure the "default" to be a very restrictive set of 
-# features.  
+# First, we configure the "default" to be a very restrictive set of
+# features.
 #
 <Directory />
     Options FollowSymLinks
@@ -189,7 +189,7 @@ DocumentRoot "/var/www/html"
 </IfModule>
 
 # The index.html.var file (a type-map) is used to deliver content-
-# negotiated documents.  The MultiViews Option can be used for the 
+# negotiated documents.  The MultiViews Option can be used for the
 # same purpose, but it is much slower.
 DirectoryIndex index.html index.html.var
 
@@ -198,8 +198,8 @@ DirectoryIndex index.html index.html.var
 # directive.
 AccessFileName .htaccess
 
-# The following lines prevent .htaccess and .htpasswd files from being 
-# viewed by Web clients. 
+# The following lines prevent .htaccess and .htpasswd files from being
+# viewed by Web clients.
 <Files ~ "^\.ht">
     Order allow,deny
     Deny from all
@@ -235,15 +235,15 @@ HostnameLookups Off
 
 # EnableMMAP: Control whether memory-mapping is used to deliver
 # files (assuming that the underlying OS supports it).
-# The default is on; turn this off if you serve from NFS-mounted 
+# The default is on; turn this off if you serve from NFS-mounted
 # filesystems.  On some systems, turning it off (regardless of
 # filesystem) can improve performance; for details, please see
 # http://httpd.apache.org/docs/2.2/mod/core.html#enablemmap
 EnableMMAP off
 
-# EnableSendfile: Control whether the sendfile kernel support is 
-# used to deliver files (assuming that the OS supports it). 
-# The default is on; turn this off if you serve from NFS-mounted 
+# EnableSendfile: Control whether the sendfile kernel support is
+# used to deliver files (assuming that the OS supports it).
+# The default is on; turn this off if you serve from NFS-mounted
 # filesystems.  Please see
 # http://httpd.apache.org/docs/2.2/mod/core.html#enablesendfile
 EnableSendfile off
@@ -278,13 +278,13 @@ CustomLog logs/access_log combined_V
 # documents or custom error documents).
 ServerSignature Off
 
-# Aliases: Add here as many aliases as you need (with no limit). The format is 
+# Aliases: Add here as many aliases as you need (with no limit). The format is
 # Alias fakename realname
 #
 # Note that if you include a trailing / on fakename then the server will
 # require it to be present in the URL.  So "/icons" isn't aliased in this
-# example, only "/icons/".  If the fakename is slash-terminated, then the 
-# realname must also be slash terminated, and if the fakename omits the 
+# example, only "/icons/".  If the fakename is slash-terminated, then the
+# realname must also be slash terminated, and if the fakename omits the
 # trailing slash, the realname must also omit it.
 #
 # We include the /icons/ alias for FancyIndexed directory listings.  If you
@@ -365,7 +365,7 @@ DefaultIcon /icons/unknown.gif
 # default, and append to directory listings.
 #
 # HeaderName is the name of a file which should be prepended to
-# directory indexes. 
+# directory indexes.
 ReadmeName README.html
 HeaderName HEADER.html
 
@@ -373,8 +373,8 @@ HeaderName HEADER.html
 # and not include in the listing.  Shell-style wildcarding is permitted.
 IndexIgnore .??* *~ *# HEADER* README* RCS CVS *,v *,t
 
-# DefaultLanguage and AddLanguage allows you to specify the language of 
-# a document. You can then use content negotiation to give a browser a 
+# DefaultLanguage and AddLanguage allows you to specify the language of
+# a document. You can then use content negotiation to give a browser a
 # file in a language the user can understand.
 AddLanguage ca .ca
 AddLanguage cs .cz .cs
@@ -416,7 +416,7 @@ LanguagePriority en ca cs da de el eo es et fr he hr it ja ko ltz nl nn no pl pt
 ForceLanguagePriority Prefer Fallback
 
 # Specify a default charset for all content served; this enables
-# interpretation of all content as UTF-8 by default.  To use the 
+# interpretation of all content as UTF-8 by default.  To use the
 # default browser choice (ISO-8859-1), or to allow the META tags
 # in HTML content to override this choice, comment out this
 # directive:
@@ -430,7 +430,7 @@ AddType application/x-gzip .gz .tgz
 AddHandler type-map var
 
 # We use Alias to redirect any /error/HTTP_<error>.html.var response to
-# our collection of by-error message multi-language collections.  We use 
+# our collection of by-error message multi-language collections.  We use
 # includes to substitute the appropriate text.
 Alias /error/ "/var/www/error/"
 
@@ -458,8 +458,8 @@ BrowserMatch "Java/1\.0" force-response-1.0
 BrowserMatch "JDK/1\.0" force-response-1.0
 
 # The following directive disables redirects on non-GET requests for
-# a directory that does not include the trailing slash.  This fixes a 
-# problem with Microsoft WebFolders which does not appropriately handle 
+# a directory that does not include the trailing slash.  This fixes a
+# problem with Microsoft WebFolders which does not appropriately handle
 # redirects for folders with DAV methods.
 # Same deal with Apple's DAV filesystem and Gnome VFS support for DAV.
 BrowserMatch "Microsoft Data Access Internet Publishing Provider" redirect-carefully
