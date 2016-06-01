@@ -1,9 +1,8 @@
-author: Bart Vanbrabant <bart@impera.io>
+author: Inmanta <code@inmanta.com>
 license: Apache 2.0
 name: apache
-source: git@git.impera.io:modules/apache
-version: 0.1.12
+version: '0.2'
 requires:
-    web: git@git.impera.io:modules/web, master
-    std: git@git.impera.io:modules/std, master
-    logging: git@git.impera.io:modules/logging, master
+- web
+- std
+- logging
