@@ -81,6 +81,15 @@ implementation appImplDEB for web::Application:
                       provides=std::Service[host=container.host, name="apache2"])
 end
 
-implement Server using apacheServerRPM, serverLogs when std::familyof(host.os, "rhel") or std::familyof(host.os, "fedora")
+implementation patchhttp2 for Server:
+# for this bug https://bugzilla.redhat.com/show_bug.cgi?id=1358875
+# in fc24
+std::Package(host=host, name="nghttp2", state="installed")
+end
+
+implement Server using apacheServerRPM, serverLogs, patchhttp2 when std::familyof(host.os, "fedora") and host.os.version == 23
+implement Server using apacheServerRPM, serverLogs when std::familyof(host.os, "rhel") or ( std::familyof(host.os, "fedora") and not host.os.version == 23)
 implement Server using apacheServerDEB, serverLogs when std::familyof(host.os, "ubuntu")
+
+
 
