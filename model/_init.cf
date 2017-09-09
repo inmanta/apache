@@ -1,5 +1,5 @@
 """
-    Copyright 2016 Inmanta
+    Copyright 2017 Inmanta
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,10 +25,9 @@ entity Server extends web::ApplicationContainer:
 end
 
 implementation apacheServerRPM for Server:
-    pkg = std::Package(host=host, name="httpd", state="installed")
-    svc = std::Service(host=host, name="httpd", state="running", onboot=true, reload=true)
-    svc.requires = [pkg, syscfg_file]
-    svc.requires = self.requires
+    pkg = std::Package(host=host, name="httpd", state="installed", requires=self.requires)
+    svc = std::Service(host=host, name="httpd", state="running", onboot=true, requires=[pkg, syscfg_file])
+    svc.provides = self.provides
 
     syscfg_file = std::ConfigFile(host=host, path="/etc/sysconfig/httpd",
     content = std::template("apache/sysconfig.tmpl"))
@@ -44,10 +43,9 @@ end
 
 implementation apacheServerDEB for Server:
     pkg = std::Package(host=host, name="apache2-mpm-worker", state="installed")
-    pkg2 = std::Package(host=host, name="apache2", state="installed")
-    svc = std::Service(host=host, name="apache2", state="running", onboot=true, reload=true)
-    svc.requires = [pkg, pkg2]
-    svc.requires = self.requires
+    pkg2 = std::Package(host=host, name="apache2", state="installed", requires=self.requires)
+    svc = std::Service(host=host, name="apache2", state="running", onboot=true, requires=[pkg, pkg2])
+    svc.provides = self.provides
 
     # put an empty index.html in the default documentroot so health checks do not fail
     index_html = std::ConfigFile(host=host, path="/var/www/html/index.html", content="",
@@ -65,8 +63,8 @@ end
 implementation appImplRPM for web::Application:
     vhost_cfg = std::ConfigFile(host=container.host, path="/etc/httpd/conf.d/{{ name.hostname }}.conf",
                                 content=std::template("apache/vhost.tmpl"),
-                                requires = std::Package[host=container.host, name="httpd"],
-                                provides = std::Service[host=container.host, name="httpd"])
+                                requires=std::Package[host=container.host, name="httpd"],
+                                provides=std::Service[host=container.host, name="httpd"])
 end
 
 implementation appImplDEB for web::Application:
@@ -90,6 +88,3 @@ end
 implement Server using apacheServerRPM, serverLogs, patchhttp2 when std::familyof(host.os, "fedora") and host.os.version == 23
 implement Server using apacheServerRPM, serverLogs when std::familyof(host.os, "rhel") or ( std::familyof(host.os, "fedora") and not host.os.version == 23)
 implement Server using apacheServerDEB, serverLogs when std::familyof(host.os, "ubuntu")
-
-
-
