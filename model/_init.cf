@@ -16,7 +16,6 @@
     Contact: code@inmanta.com
 """
 import web
-import logging
 
 entity Server extends web::ApplicationContainer:
     """
@@ -54,11 +53,6 @@ implementation apacheServerDEB for Server:
     self.group = "www-data"
 end
 
-implementation serverLogs for Server:
-    logging::LogFile(host=host, path="/var/log/httpd/access_log", type="apache", tag="access")
-    logging::LogFile(host=host, path="/var/log/httpd/error_log", type="apache", tag="error")
-end
-
 implementation appImplRPM for web::Application:
     vhost_cfg = std::ConfigFile(host=container.host, path="/etc/httpd/conf.d/{{ name.hostname }}.conf",
                                 content=std::template("apache/vhost.tmpl"),
@@ -84,6 +78,6 @@ implementation patchhttp2 for Server:
 std::Package(host=host, name="nghttp2", state="installed")
 end
 
-implement Server using apacheServerRPM, serverLogs, patchhttp2 when std::familyof(host.os, "fedora") and host.os.version == 23
-implement Server using apacheServerRPM, serverLogs when std::familyof(host.os, "rhel") or ( std::familyof(host.os, "fedora") and not host.os.version == 23)
-implement Server using apacheServerDEB, serverLogs when std::familyof(host.os, "ubuntu")
+implement Server using apacheServerRPM, patchhttp2 when std::familyof(host.os, "fedora") and host.os.version == 23
+implement Server using apacheServerRPM when std::familyof(host.os, "rhel") or ( std::familyof(host.os, "fedora") and not host.os.version == 23)
+implement Server using apacheServerDEB when std::familyof(host.os, "ubuntu")
