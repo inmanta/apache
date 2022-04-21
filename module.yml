@@ -1,7 +1,7 @@
 author: Inmanta <code@inmanta.com>
 license: Apache 2.0
 name: apache
-version: 0.5.4
+version: 0.6.0.dev1650528489
 requires:
 - web
 - std
